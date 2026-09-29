@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/services/api'
+import sound from '@/services/sound'
 import router from '@/router'
 
 export const useQuizStore = defineStore('quiz', {
@@ -20,6 +21,9 @@ export const useQuizStore = defineStore('quiz', {
     selectedChoiceId: null,
     isQuestionAnswered: false,
     
+    // Saved Player Nickname in localStorage
+    savedPlayerName: localStorage.getItem('rapidquiz_player_name') || '',
+
     // Final result from backend
     quizResult: null,
     isSubmitting: false,
@@ -58,6 +62,7 @@ export const useQuizStore = defineStore('quiz', {
       this.resetQuiz()
       this.isLoading = true
       this.error = null
+      sound.playClick()
 
       try {
         const response = await api.getCategoryQuestions(categorySlug)
@@ -78,7 +83,7 @@ export const useQuizStore = defineStore('quiz', {
         }
       } catch (err) {
         console.error('Failed to start quiz:', err)
-        this.error = 'Sorular yüklenirken hata oluştu. Lütfen tekrar deneyin.'
+        this.error = 'Sorular yüklenirken hata oluştu. Backend sunucusunun çalıştığından emin olun.'
       } finally {
         this.isLoading = false
       }
@@ -92,10 +97,19 @@ export const useQuizStore = defineStore('quiz', {
       this.questionStartTime = Date.now()
       this.isTimerRunning = true
 
+      let lastTickSecond = 5
+
       const stepMs = 50
       this.timerInterval = setInterval(() => {
         const elapsedSec = (Date.now() - this.questionStartTime) / 1000
         this.timeRemaining = Math.max(0, parseFloat((5.0 - elapsedSec).toFixed(2)))
+
+        // Sound tick on last 2 seconds
+        const currentSecFloor = Math.ceil(this.timeRemaining)
+        if (currentSecFloor <= 2 && currentSecFloor < lastTickSecond && currentSecFloor > 0) {
+          lastTickSecond = currentSecFloor
+          sound.playTick()
+        }
 
         if (this.timeRemaining <= 0) {
           this.handleTimeUp()
@@ -114,6 +128,7 @@ export const useQuizStore = defineStore('quiz', {
     handleTimeUp() {
       this.stopQuestionTimer()
       if (!this.isQuestionAnswered) {
+        sound.playTimeUp()
         this.recordAnswer(null, 5.0)
         this.scheduleNextQuestion(600)
       }
@@ -122,6 +137,7 @@ export const useQuizStore = defineStore('quiz', {
     selectAnswer(choiceId) {
       if (this.isQuestionAnswered) return // prevent double click
 
+      sound.playClick()
       const elapsedSec = Math.min(5.0, (Date.now() - this.questionStartTime) / 1000)
       this.stopQuestionTimer()
       this.selectedChoiceId = choiceId
@@ -161,18 +177,23 @@ export const useQuizStore = defineStore('quiz', {
     async submitScore(playerName) {
       if (!this.currentCategory || !playerName.trim()) return
 
+      const cleanName = playerName.trim()
+      this.savedPlayerName = cleanName
+      localStorage.setItem('rapidquiz_player_name', cleanName)
+
       this.isSubmitting = true
       this.error = null
 
       try {
         const payload = {
           category_slug: this.currentCategory.slug,
-          player_name: playerName.trim(),
+          player_name: cleanName,
           answers: this.answers,
         }
 
         const response = await api.submitQuiz(payload)
         this.quizResult = response.data
+        sound.playCelebration()
         return response.data
       } catch (err) {
         console.error('Failed to submit score:', err)

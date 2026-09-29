@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useQuizStore } from '@/stores/quiz'
 import confetti from 'canvas-confetti'
 import LeaderboardTable from '@/components/LeaderboardTable.vue'
+import sound from '@/services/sound'
 import {
   Trophy,
   Zap,
@@ -20,7 +21,7 @@ import {
 const router = useRouter()
 const quizStore = useQuizStore()
 
-const playerName = ref('')
+const playerName = ref(quizStore.savedPlayerName || '')
 const isSubmitted = ref(false)
 const inputError = ref('')
 
@@ -31,7 +32,8 @@ onMounted(() => {
     return
   }
 
-  // Trigger celebration confetti
+  // Trigger celebration confetti & chime
+  sound.playCelebration()
   triggerConfetti()
 })
 
@@ -83,6 +85,7 @@ const handleSaveScore = async () => {
 }
 
 const handlePlayAgain = () => {
+  sound.playClick()
   if (quizStore.currentCategory?.slug) {
     quizStore.startQuiz(quizStore.currentCategory.slug)
   } else {
@@ -91,6 +94,7 @@ const handlePlayAgain = () => {
 }
 
 const handleChooseCategory = () => {
+  sound.playClick()
   quizStore.resetQuiz()
   router.push('/')
 }
@@ -147,7 +151,7 @@ const handleChooseCategory = () => {
         <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Süresi Dolan</span>
       </div>
 
-      <!-- Category Points Base -->
+      <!-- Speed Bonus Indicator -->
       <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 text-center">
         <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
           <Sparkles class="w-4 h-4" />
@@ -190,7 +194,7 @@ const handleChooseCategory = () => {
           <button
             type="submit"
             :disabled="quizStore.isSubmitting"
-            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-base shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-base shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span v-if="quizStore.isSubmitting">Hesaplanıyor & Kaydediliyor...</span>
             <span v-else class="flex items-center gap-2">
@@ -254,7 +258,7 @@ const handleChooseCategory = () => {
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
       <button
         @click="handlePlayAgain"
-        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-cyan-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-cyan-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
       >
         <RotateCcw class="w-4 h-4" />
         <span>Yeniden Oyna</span>
@@ -262,7 +266,7 @@ const handleChooseCategory = () => {
 
       <button
         @click="handleChooseCategory"
-        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl glass-card border-slate-700 text-slate-200 font-bold text-sm hover:bg-slate-800 hover:text-white transition-all flex items-center justify-center gap-2"
+        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl glass-card border-slate-700 text-slate-200 font-bold text-sm hover:bg-slate-800 hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
       >
         <span>Farklı Kategori Seç</span>
       </button>

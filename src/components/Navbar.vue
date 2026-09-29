@@ -1,9 +1,20 @@
 <script setup>
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Zap, Trophy, Home } from 'lucide-vue-next'
+import { Zap, Trophy, Home, Volume2, VolumeX } from 'lucide-vue-next'
+import sound from '@/services/sound'
 
 const router = useRouter()
 const route = useRoute()
+
+const isMuted = ref(sound.isMuted)
+
+const toggleSound = () => {
+  isMuted.value = sound.toggleMute()
+  if (!isMuted.value) {
+    sound.playClick()
+  }
+}
 </script>
 
 <template>
@@ -43,6 +54,16 @@ const route = useRoute()
           <Trophy class="w-4 h-4 text-amber-400" />
           <span>Lider Tablosu</span>
         </router-link>
+
+        <!-- Sound Toggle Button -->
+        <button
+          @click="toggleSound"
+          class="p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition-colors border border-transparent hover:border-slate-700/60"
+          :title="isMuted ? 'Sesi Aç' : 'Sesi Kapat'"
+        >
+          <VolumeX v-if="isMuted" class="w-4 h-4 text-slate-500" />
+          <Volume2 v-else class="w-4 h-4 text-cyan-400" />
+        </button>
       </nav>
     </div>
   </header>
