@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useQuizStore } from '@/stores/quiz'
 import confetti from 'canvas-confetti'
 import LeaderboardTable from '@/components/LeaderboardTable.vue'
+import AnswerReview from '@/components/AnswerReview.vue'
 import sound from '@/services/sound'
 import {
   Trophy,
@@ -16,6 +17,7 @@ import {
   Sparkles,
   ArrowRight,
   ListOrdered,
+  BookOpen,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -24,6 +26,7 @@ const quizStore = useQuizStore()
 const playerName = ref(quizStore.savedPlayerName || '')
 const isSubmitted = ref(false)
 const inputError = ref('')
+const activeTab = ref('leaderboard') // 'leaderboard' or 'review'
 
 onMounted(() => {
   // If no answers exist, redirect to home
@@ -173,7 +176,7 @@ const handleChooseCategory = () => {
           Skorunu Kaydet & Lider Tablosuna Gir!
         </h3>
         <p class="text-xs text-slate-400 mb-6">
-          Adını veya takma adını girerek puanını skorborda yazdır.
+          Adını veya takma adını girerek puanını skorborda yazdır ve doğru/yanlış cevaplarını incele.
         </p>
 
         <form @submit.prevent="handleSaveScore" class="space-y-4">
@@ -198,7 +201,7 @@ const handleChooseCategory = () => {
           >
             <span v-if="quizStore.isSubmitting">Hesaplanıyor & Kaydediliyor...</span>
             <span v-else class="flex items-center gap-2">
-              Skorunu Gönder & Sıralamanı Gör
+              Skorunu Gönder & Sonuçları Gör
               <ArrowRight class="w-5 h-5" />
             </span>
           </button>
@@ -206,7 +209,7 @@ const handleChooseCategory = () => {
       </div>
     </div>
 
-    <!-- 2. State: Results & Leaderboard (After Submit) -->
+    <!-- 2. State: Results, Leaderboard & Answer Review (After Submit) -->
     <div v-else class="space-y-8 mb-8">
       <!-- Player Result Highlight Banner -->
       <div class="glass-card p-6 sm:p-8 rounded-3xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 shadow-2xl text-center relative overflow-hidden">
@@ -219,25 +222,54 @@ const handleChooseCategory = () => {
         </div>
 
         <div class="flex items-center justify-center gap-4 text-xs sm:text-sm font-semibold text-slate-300">
-          <span class="flex items-center gap-1.5 text-emerald-400">
+          <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
             <CheckCircle2 class="w-4 h-4" />
             {{ quizStore.quizResult?.correct_count }} Doğru
           </span>
           <span>•</span>
-          <span class="flex items-center gap-1.5 text-rose-400">
+          <span class="flex items-center gap-1.5 text-rose-400 font-bold">
             <XCircle class="w-4 h-4" />
             {{ quizStore.quizResult?.wrong_count }} Yanlış
           </span>
           <span>•</span>
-          <span class="flex items-center gap-1.5 text-sky-400">
+          <span class="flex items-center gap-1.5 text-sky-400 font-bold">
             <Clock class="w-4 h-4" />
             {{ quizStore.quizResult?.total_time_taken }}s
           </span>
         </div>
       </div>
 
-      <!-- Top 10 Leaderboard for Category -->
-      <div>
+      <!-- Navigation Tabs (Leaderboard vs Answer Review) -->
+      <div class="flex items-center justify-center gap-3 border-b border-slate-800 pb-4">
+        <button
+          @click="activeTab = 'leaderboard'"
+          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border"
+          :class="[
+            activeTab === 'leaderboard'
+              ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-lg shadow-amber-400/20'
+              : 'glass-card text-slate-300 border-slate-800 hover:bg-slate-800'
+          ]"
+        >
+          <ListOrdered class="w-4 h-4" />
+          <span>Lider Tablosu (Top 10)</span>
+        </button>
+
+        <button
+          @click="activeTab = 'review'"
+          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border"
+          :class="[
+            activeTab === 'review'
+              ? 'bg-cyan-400 text-slate-950 border-cyan-400 shadow-lg shadow-cyan-400/20'
+              : 'glass-card text-slate-300 border-slate-800 hover:bg-slate-800'
+          ]"
+        >
+          <BookOpen class="w-4 h-4" />
+          <span>Cevapları İncele & Doğruları Gör</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Top 10 Leaderboard -->
+      <div v-if="activeTab === 'leaderboard'">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
             <ListOrdered class="w-5 h-5 text-cyan-400" />
@@ -250,6 +282,13 @@ const handleChooseCategory = () => {
         <LeaderboardTable
           :scores="quizStore.quizResult?.top_10 || []"
           :highlight-player-name="quizStore.quizResult?.player_name"
+        />
+      </div>
+
+      <!-- Tab 2: Educational Answer Review -->
+      <div v-if="activeTab === 'review'">
+        <AnswerReview
+          :breakdown="quizStore.quizResult?.results_breakdown || []"
         />
       </div>
     </div>
