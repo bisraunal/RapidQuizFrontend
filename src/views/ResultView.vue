@@ -1,0 +1,271 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuizStore } from '@/stores/quiz'
+import confetti from 'canvas-confetti'
+import LeaderboardTable from '@/components/LeaderboardTable.vue'
+import {
+  Trophy,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  MinusCircle,
+  Clock,
+  RotateCcw,
+  Sparkles,
+  ArrowRight,
+  ListOrdered,
+} from 'lucide-vue-next'
+
+const router = useRouter()
+const quizStore = useQuizStore()
+
+const playerName = ref('')
+const isSubmitted = ref(false)
+const inputError = ref('')
+
+onMounted(() => {
+  // If no answers exist, redirect to home
+  if (quizStore.answers.length === 0) {
+    router.push('/')
+    return
+  }
+
+  // Trigger celebration confetti
+  triggerConfetti()
+})
+
+const triggerConfetti = () => {
+  const duration = 2.5 * 1000
+  const animationEnd = Date.now() + duration
+
+  const frame = () => {
+    confetti({
+      particleCount: 4,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors: ['#06b6d4', '#3b82f6', '#a855f7', '#10b981', '#f59e0b'],
+    })
+    confetti({
+      particleCount: 4,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors: ['#06b6d4', '#3b82f6', '#a855f7', '#10b981', '#f59e0b'],
+    })
+
+    if (Date.now() < animationEnd) {
+      requestAnimationFrame(frame)
+    }
+  }
+  frame()
+}
+
+const handleSaveScore = async () => {
+  if (!playerName.value.trim()) {
+    inputError.value = 'Lütfen skorborda yazılacak bir takma ad girin.'
+    return
+  }
+  if (playerName.value.trim().length < 2) {
+    inputError.value = 'Takma ad en az 2 karakter olmalıdır.'
+    return
+  }
+
+  inputError.value = ''
+  try {
+    await quizStore.submitScore(playerName.value.trim())
+    isSubmitted.value = true
+    triggerConfetti()
+  } catch (err) {
+    // handled in store
+  }
+}
+
+const handlePlayAgain = () => {
+  if (quizStore.currentCategory?.slug) {
+    quizStore.startQuiz(quizStore.currentCategory.slug)
+  } else {
+    router.push('/')
+  }
+}
+
+const handleChooseCategory = () => {
+  quizStore.resetQuiz()
+  router.push('/')
+}
+</script>
+
+<template>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <!-- Header Greeting -->
+    <div class="text-center mb-8 sm:mb-10">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 shadow-xl shadow-amber-500/20 mb-4 animate-bounce">
+        <Trophy class="w-8 h-8" />
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Tebrikler! Quiz Tamamlandı
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base mt-2">
+        <span class="font-bold text-cyan-400">{{ quizStore.currentCategory?.name }}</span> kategorisinde 20 soruyu tamamladın.
+      </p>
+    </div>
+
+    <!-- Stats Summary Cards Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-8">
+      <!-- Total Questions -->
+      <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 text-center">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+          <Zap class="w-4 h-4" />
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-100">
+          {{ quizStore.answers.length }}
+        </div>
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Cevaplanan</span>
+      </div>
+
+      <!-- Time Taken -->
+      <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 text-center">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center">
+          <Clock class="w-4 h-4" />
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-100">
+          {{ quizStore.answers.reduce((acc, cur) => acc + (cur.time_taken || 0), 0).toFixed(1) }}s
+        </div>
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Toplam Süre</span>
+      </div>
+
+      <!-- Empty / Timeout -->
+      <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 text-center">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+          <MinusCircle class="w-4 h-4" />
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-100">
+          {{ quizStore.answers.filter(a => a.selected_choice_id === null).length }}
+        </div>
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Süresi Dolan</span>
+      </div>
+
+      <!-- Category Points Base -->
+      <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 text-center">
+        <div class="w-8 h-8 mx-auto mb-2 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
+          <Sparkles class="w-4 h-4" />
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-100">
+          +Hız Bonusu
+        </div>
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Ekstra Puan</span>
+      </div>
+    </div>
+
+    <!-- 1. State: Name Input Form (Before Submit) -->
+    <div
+      v-if="!isSubmitted"
+      class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden mb-8"
+    >
+      <div class="max-w-md mx-auto text-center">
+        <h3 class="text-xl font-bold text-slate-100 mb-1">
+          Skorunu Kaydet & Lider Tablosuna Gir!
+        </h3>
+        <p class="text-xs text-slate-400 mb-6">
+          Adını veya takma adını girerek puanını skorborda yazdır.
+        </p>
+
+        <form @submit.prevent="handleSaveScore" class="space-y-4">
+          <div>
+            <input
+              v-model="playerName"
+              type="text"
+              maxlength="20"
+              placeholder="Örn: EfsaneYazilimci"
+              class="w-full px-5 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 text-white placeholder-slate-500 text-center text-lg font-bold focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition-all"
+              :disabled="quizStore.isSubmitting"
+            />
+            <p v-if="inputError" class="text-xs text-rose-400 font-semibold mt-2">
+              {{ inputError }}
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="quizStore.isSubmitting"
+            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-base shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <span v-if="quizStore.isSubmitting">Hesaplanıyor & Kaydediliyor...</span>
+            <span v-else class="flex items-center gap-2">
+              Skorunu Gönder & Sıralamanı Gör
+              <ArrowRight class="w-5 h-5" />
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. State: Results & Leaderboard (After Submit) -->
+    <div v-else class="space-y-8 mb-8">
+      <!-- Player Result Highlight Banner -->
+      <div class="glass-card p-6 sm:p-8 rounded-3xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 shadow-2xl text-center relative overflow-hidden">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold mb-3 border border-cyan-400/30">
+          <span>🏆 Derecen: {{ quizStore.quizResult?.rank }}. Sıra</span>
+        </div>
+
+        <div class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent mb-2">
+          {{ quizStore.quizResult?.total_score }} PUAN
+        </div>
+
+        <div class="flex items-center justify-center gap-4 text-xs sm:text-sm font-semibold text-slate-300">
+          <span class="flex items-center gap-1.5 text-emerald-400">
+            <CheckCircle2 class="w-4 h-4" />
+            {{ quizStore.quizResult?.correct_count }} Doğru
+          </span>
+          <span>•</span>
+          <span class="flex items-center gap-1.5 text-rose-400">
+            <XCircle class="w-4 h-4" />
+            {{ quizStore.quizResult?.wrong_count }} Yanlış
+          </span>
+          <span>•</span>
+          <span class="flex items-center gap-1.5 text-sky-400">
+            <Clock class="w-4 h-4" />
+            {{ quizStore.quizResult?.total_time_taken }}s
+          </span>
+        </div>
+      </div>
+
+      <!-- Top 10 Leaderboard for Category -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <ListOrdered class="w-5 h-5 text-cyan-400" />
+            <h3 class="text-xl font-bold text-white">
+              {{ quizStore.currentCategory?.name }} — Top 10 Lider Tablosu
+            </h3>
+          </div>
+        </div>
+
+        <LeaderboardTable
+          :scores="quizStore.quizResult?.top_10 || []"
+          :highlight-player-name="quizStore.quizResult?.player_name"
+        />
+      </div>
+    </div>
+
+    <!-- Action Buttons Footer -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
+      <button
+        @click="handlePlayAgain"
+        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-cyan-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+      >
+        <RotateCcw class="w-4 h-4" />
+        <span>Yeniden Oyna</span>
+      </button>
+
+      <button
+        @click="handleChooseCategory"
+        class="w-full sm:w-auto px-6 py-3.5 rounded-2xl glass-card border-slate-700 text-slate-200 font-bold text-sm hover:bg-slate-800 hover:text-white transition-all flex items-center justify-center gap-2"
+      >
+        <span>Farklı Kategori Seç</span>
+      </button>
+    </div>
+  </div>
+</template>
