@@ -1,4 +1,4 @@
-# ⚡ Rapid Quiz — Frontend Web Application
+# Rapid Quiz — Frontend Web Application
 
 <div align="center">
 
@@ -16,19 +16,19 @@
 
 ---
 
-## 🎮 Oyun Deneyimi & Özellikler
+## Oyun Deneyimi ve Özellikler
 
-* ⏱️ **5 Saniyelik Dinamik Geri Sayım Barı:** Yeşil ➔ Sarı ➔ Yanıp sönen Kırmızı renk geçişi.
-* 🔊 **Dahili Web Audio Ses Efektleri:** Sıfır dış dosya bağımlılığıyla tık sesleri, geri sayım 'tick' uyarıları, süre bitimi ve kutlama fanfarı.
-* ⌨️ **Klavye Kısayol Desteği:** Masaüstü kullanıcıları için `A, B, C, D` veya `1, 2, 3, 4` tuşlarıyla anlık cevaplama.
-* 📖 **Detaylı Cevap İnceleme & Öğrenme Modu:** Quiz bitiminde doğru, yanlış ve boş bırakılan soruları doğru şıklarla karşılaştırmalı inceleme.
-* 🏆 **Lider Tablosu (Top 10):** Kategori bazlı ve genel sıralamada altın (🥇), gümüş (🥈), bronz (🥉) podyum gösterimi.
-* 🎉 **Konfeti Kutlaması:** Canvas-confetti entegrasyonu ile dinamik tebrik animasyonu.
-* 💾 **Kalıcı Nickname:** `localStorage` ile oyuncu adını hatırlama.
+* **5 Saniyelik Dinamik Geri Sayım Barı:** Yeşil, Sarı ve Kırmızı renk geçişli sayaç.
+* **Dahili Web Audio Ses Efektleri:** Sıfır dış dosya bağımlılığıyla tık sesleri, geri sayım uyarıları, süre bitimi ve kutlama fanfarı.
+* **Klavye Kısayol Desteği:** Masaüstü kullanıcıları için `A, B, C, D` veya `1, 2, 3, 4` tuşlarıyla anlık cevaplama.
+* **Detaylı Cevap İnceleme ve Öğrenme Modu:** Quiz bitiminde doğru, yanlış ve boş bırakılan soruları doğru şıklarla karşılaştırmalı inceleme.
+* **Lider Tablosu (Top 10):** Kategori bazlı ve genel sıralamada 1., 2., 3. podyum gösterimi.
+* **Konfeti Kutlaması:** Canvas-confetti entegrasyonu ile dinamik tebrik animasyonu.
+* **Kalıcı Nickname:** `localStorage` ile oyuncu adını hatırlama.
 
 ---
 
-## 📂 Proje Yapısı
+## Proje Yapısı
 
 ```
 src/
@@ -50,7 +50,7 @@ src/
 
 ---
 
-## 🛠️ Kurulum ve Çalıştırma
+## Kurulum ve Çalıştırma
 
 ### 1. Bağımlılıkları Yükleyin
 ```bash
@@ -69,6 +69,6 @@ npm run build
 
 ---
 
-## 🌍 Canlı Yayın (Deployment)
+## Canlı Yayın (Deployment)
 
 Proje **Vercel** üzerinde barındırılmaktadır. `main` dalına yapılan her commit otomatik olarak derlenip canlıya alınır.
