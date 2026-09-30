@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { Code2, Bot, Cpu, Globe, Atom, HelpCircle, ArrowRight } from 'lucide-vue-next'
+import { Code2, Bot, Cpu, Globe, Atom, Trophy, HelpCircle, ArrowRight } from 'lucide-vue-next'
 
 const props = defineProps({
   category: {
@@ -17,6 +17,7 @@ const iconMap = {
   Cpu: Cpu,
   Globe: Globe,
   Atom: Atom,
+  Trophy: Trophy,
 }
 
 const CategoryIcon = computed(() => iconMap[props.category.icon] || HelpCircle)
@@ -63,6 +64,14 @@ const themeStyles = computed(() => {
         glow: 'group-hover:shadow-[0_0_30px_rgba(249,115,22,0.25)]',
         accentText: 'text-orange-400',
       }
+    case 'rose':
+      return {
+        cardBorder: 'hover:border-rose-500/60 hover:shadow-rose-500/20',
+        badge: 'bg-rose-950/60 text-rose-400 border-rose-800/40',
+        iconBg: 'bg-rose-500/10 text-rose-400 border-rose-500/20 group-hover:bg-rose-500 group-hover:text-slate-950',
+        glow: 'group-hover:shadow-[0_0_30px_rgba(244,63,94,0.25)]',
+        accentText: 'text-rose-400',
+      }
     default:
       return {
         cardBorder: 'hover:border-cyan-500/60',
@@ -78,7 +87,7 @@ const themeStyles = computed(() => {
 <template>
   <button
     @click="$emit('select', category.slug)"
-    class="group text-left relative glass-card p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400/50"
+    class="group text-left relative glass-card p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 cursor-pointer"
     :class="[themeStyles.cardBorder, themeStyles.glow]"
   >
     <div class="flex items-start justify-between mb-5">
