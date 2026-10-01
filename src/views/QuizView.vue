@@ -18,6 +18,7 @@ onMounted(() => {
       quizStore.startQuiz(route.params.slug).then(() => {
         if (quizStore.questions.length > 0) {
           quizStore.startQuestionTimer()
+          sound.playCategoryBgm(route.params.slug)
         }
       })
     } else {
@@ -25,6 +26,9 @@ onMounted(() => {
     }
   } else {
     quizStore.startQuestionTimer()
+    if (route.params.slug) {
+      sound.playCategoryBgm(route.params.slug)
+    }
   }
 
   window.addEventListener('keydown', handleKeyPress)

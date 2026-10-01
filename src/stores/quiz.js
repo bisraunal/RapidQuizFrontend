@@ -78,10 +78,8 @@ export const useQuizStore = defineStore('quiz', {
         this.questions = data.questions || []
         this.currentQuestionIndex = 0
 
-        // Start background music for the category
-        if (data.music_url) {
-          sound.playBgm(data.music_url)
-        }
+        // Start procedural Web Audio background music for the category
+        sound.playCategoryBgm(categorySlug)
 
         if (this.questions.length > 0) {
           router.push(`/quiz/${categorySlug}`)
