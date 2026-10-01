@@ -72,9 +72,16 @@ export const useQuizStore = defineStore('quiz', {
           slug: data.category_slug,
           icon: data.icon,
           colorTheme: data.color_theme,
+          musicUrl: data.music_url,
+          musicTitle: data.music_title,
         }
         this.questions = data.questions || []
         this.currentQuestionIndex = 0
+
+        // Start background music for the category
+        if (data.music_url) {
+          sound.playBgm(data.music_url)
+        }
 
         if (this.questions.length > 0) {
           router.push(`/quiz/${categorySlug}`)
@@ -171,6 +178,7 @@ export const useQuizStore = defineStore('quiz', {
 
     finishQuiz() {
       this.stopQuestionTimer()
+      sound.stopBgm()
       router.push('/result')
     },
 
@@ -206,6 +214,7 @@ export const useQuizStore = defineStore('quiz', {
 
     resetQuiz() {
       this.stopQuestionTimer()
+      sound.stopBgm()
       this.questions = []
       this.currentQuestionIndex = 0
       this.answers = []

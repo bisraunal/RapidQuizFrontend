@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { Code2, Bot, Cpu, Globe, Atom, Trophy, HelpCircle, ArrowRight } from 'lucide-vue-next'
+import { Code2, Bot, Cpu, Globe, Atom, Trophy, ChefHat, UtensilsCrossed, HelpCircle, ArrowRight, Music } from 'lucide-vue-next'
 
 const props = defineProps({
   category: {
@@ -18,6 +18,8 @@ const iconMap = {
   Globe: Globe,
   Atom: Atom,
   Trophy: Trophy,
+  ChefHat: ChefHat,
+  UtensilsCrossed: UtensilsCrossed,
 }
 
 const CategoryIcon = computed(() => iconMap[props.category.icon] || HelpCircle)
@@ -72,6 +74,15 @@ const themeStyles = computed(() => {
         glow: 'group-hover:shadow-[0_0_30px_rgba(244,63,94,0.25)]',
         accentText: 'text-rose-400',
       }
+    case 'amber':
+    case 'yellow':
+      return {
+        cardBorder: 'hover:border-amber-500/60 hover:shadow-amber-500/20',
+        badge: 'bg-amber-950/60 text-amber-400 border-amber-800/40',
+        iconBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20 group-hover:bg-amber-500 group-hover:text-slate-950',
+        glow: 'group-hover:shadow-[0_0_30px_rgba(245,158,11,0.25)]',
+        accentText: 'text-amber-400',
+      }
     default:
       return {
         cardBorder: 'hover:border-cyan-500/60',
@@ -114,11 +125,17 @@ const themeStyles = computed(() => {
     </h3>
 
     <!-- Subtitle / Meta -->
-    <p class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
+    <p class="text-xs text-slate-400 mb-4 flex items-center gap-1.5">
       <span>⏱ Soru başına 5 saniye</span>
       <span>•</span>
       <span>⚡ Refleks Testi</span>
     </p>
+
+    <!-- Music Info Tag -->
+    <div v-if="category.music_title" class="mb-4 flex items-center gap-1.5 text-[11px] text-slate-400/90 bg-slate-900/60 py-1 px-2.5 rounded-lg border border-slate-800/70">
+      <Music class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+      <span class="truncate">{{ category.music_title }}</span>
+    </div>
 
     <!-- Action Arrow Footer -->
     <div class="flex items-center justify-between pt-4 border-t border-slate-800/60">

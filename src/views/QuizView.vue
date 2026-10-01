@@ -2,9 +2,10 @@
 import { onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuizStore } from '@/stores/quiz'
+import sound from '@/services/sound'
 import TimerBar from '@/components/TimerBar.vue'
 import QuestionCard from '@/components/QuestionCard.vue'
-import { X, HelpCircle, Zap } from 'lucide-vue-next'
+import { X, HelpCircle, Zap, Music } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,6 +32,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   quizStore.stopQuestionTimer()
+  sound.stopBgm()
   window.removeEventListener('keydown', handleKeyPress)
 })
 
@@ -59,7 +61,7 @@ const handleExitQuiz = () => {
     <!-- Top Quiz Navigation -->
     <div class="flex items-center justify-between mb-6">
       <!-- Category Badge -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center border border-cyan-500/30 font-bold">
           <Zap class="w-4 h-4" />
         </div>
@@ -69,14 +71,26 @@ const handleExitQuiz = () => {
         </div>
       </div>
 
-      <!-- Exit Button -->
-      <button
-        @click="handleExitQuiz"
-        class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 transition-colors border border-slate-800"
-        title="Quizden Çık"
-      >
-        <X class="w-5 h-5" />
-      </button>
+      <div class="flex items-center gap-3">
+        <!-- Playing BGM Indicator -->
+        <div
+          v-if="quizStore.currentCategory?.musicTitle"
+          class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-[11px] text-cyan-400/90 shadow-sm"
+          title="Çalan Arka Plan Müziği"
+        >
+          <Music class="w-3 h-3 text-cyan-400 animate-pulse" />
+          <span class="max-w-[180px] truncate font-medium">{{ quizStore.currentCategory.musicTitle }}</span>
+        </div>
+
+        <!-- Exit Button -->
+        <button
+          @click="handleExitQuiz"
+          class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 transition-colors border border-slate-800"
+          title="Quizden Çık"
+        >
+          <X class="w-5 h-5" />
+        </button>
+      </div>
     </div>
 
     <!-- Timer Bar (5s Count Down) -->
