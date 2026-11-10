@@ -6,11 +6,11 @@ const props = defineProps({
   timeRemaining: {
     type: Number,
     required: true,
-    default: 5.0,
+    default: 10.0,
   },
   maxTime: {
     type: Number,
-    default: 5.0,
+    default: 10.0,
   },
 })
 
@@ -19,9 +19,10 @@ const percentage = computed(() => {
 })
 
 const timerColorClass = computed(() => {
-  if (props.timeRemaining > 2.5) {
+  const ratio = props.timeRemaining / props.maxTime
+  if (ratio > 0.5) {
     return 'bg-gradient-to-r from-emerald-500 to-green-400 shadow-emerald-500/30'
-  } else if (props.timeRemaining > 1.2) {
+  } else if (ratio > 0.25) {
     return 'bg-gradient-to-r from-amber-500 to-yellow-400 shadow-amber-500/30'
   } else {
     return 'bg-gradient-to-r from-rose-600 to-red-500 shadow-red-500/50 animate-pulse'
@@ -29,8 +30,9 @@ const timerColorClass = computed(() => {
 })
 
 const textColorClass = computed(() => {
-  if (props.timeRemaining > 2.5) return 'text-emerald-400'
-  if (props.timeRemaining > 1.2) return 'text-amber-400'
+  const ratio = props.timeRemaining / props.maxTime
+  if (ratio > 0.5) return 'text-emerald-400'
+  if (ratio > 0.25) return 'text-amber-400'
   return 'text-rose-400 animate-pulse font-extrabold'
 })
 </script>

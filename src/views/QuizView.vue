@@ -97,11 +97,11 @@ const handleExitQuiz = () => {
       </div>
     </div>
 
-    <!-- Timer Bar (5s Count Down) -->
+    <!-- Timer Bar (10s Count Down) -->
     <div class="mb-6">
       <TimerBar
         :time-remaining="quizStore.timeRemaining"
-        :max-time="5.0"
+        :max-time="10.0"
       />
     </div>
 

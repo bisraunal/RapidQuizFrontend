@@ -11,8 +11,8 @@ export const useQuizStore = defineStore('quiz', {
     currentQuestionIndex: 0,
     answers: [],
     
-    // Timer state (5 seconds per question)
-    timeRemaining: 5.0,
+    // Timer state (10 seconds per question)
+    timeRemaining: 10.0,
     questionStartTime: 0,
     timerInterval: null,
     isTimerRunning: false,
@@ -96,22 +96,22 @@ export const useQuizStore = defineStore('quiz', {
 
     startQuestionTimer() {
       this.stopQuestionTimer()
-      this.timeRemaining = 5.0
+      this.timeRemaining = 10.0
       this.selectedChoiceId = null
       this.isQuestionAnswered = false
       this.questionStartTime = Date.now()
       this.isTimerRunning = true
 
-      let lastTickSecond = 5
+      let lastTickSecond = 10
 
       const stepMs = 50
       this.timerInterval = setInterval(() => {
         const elapsedSec = (Date.now() - this.questionStartTime) / 1000
-        this.timeRemaining = Math.max(0, parseFloat((5.0 - elapsedSec).toFixed(2)))
+        this.timeRemaining = Math.max(0, parseFloat((10.0 - elapsedSec).toFixed(2)))
 
-        // Sound tick on last 2 seconds
+        // Sound tick on last 3 seconds
         const currentSecFloor = Math.ceil(this.timeRemaining)
-        if (currentSecFloor <= 2 && currentSecFloor < lastTickSecond && currentSecFloor > 0) {
+        if (currentSecFloor <= 3 && currentSecFloor < lastTickSecond && currentSecFloor > 0) {
           lastTickSecond = currentSecFloor
           sound.playTick()
         }
@@ -134,7 +134,7 @@ export const useQuizStore = defineStore('quiz', {
       this.stopQuestionTimer()
       if (!this.isQuestionAnswered) {
         sound.playTimeUp()
-        this.recordAnswer(null, 5.0)
+        this.recordAnswer(null, 10.0)
         this.scheduleNextQuestion(600)
       }
     },
@@ -143,7 +143,7 @@ export const useQuizStore = defineStore('quiz', {
       if (this.isQuestionAnswered) return // prevent double click
 
       sound.playClick()
-      const elapsedSec = Math.min(5.0, (Date.now() - this.questionStartTime) / 1000)
+      const elapsedSec = Math.min(10.0, (Date.now() - this.questionStartTime) / 1000)
       this.stopQuestionTimer()
       this.selectedChoiceId = choiceId
       this.isQuestionAnswered = true
@@ -216,7 +216,7 @@ export const useQuizStore = defineStore('quiz', {
       this.questions = []
       this.currentQuestionIndex = 0
       this.answers = []
-      this.timeRemaining = 5.0
+      this.timeRemaining = 10.0
       this.selectedChoiceId = null
       this.isQuestionAnswered = false
       this.quizResult = null

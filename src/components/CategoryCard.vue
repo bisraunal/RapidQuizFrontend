@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { Code2, Bot, Cpu, Globe, Atom, Trophy, ChefHat, UtensilsCrossed, HelpCircle, ArrowRight, Music } from 'lucide-vue-next'
+import { Code2, Bot, Cpu, Globe, Atom, Trophy, ChefHat, UtensilsCrossed, Clapperboard, Landmark, HelpCircle, ArrowRight, Music } from 'lucide-vue-next'
 
 const props = defineProps({
   category: {
@@ -20,6 +20,8 @@ const iconMap = {
   Trophy: Trophy,
   ChefHat: ChefHat,
   UtensilsCrossed: UtensilsCrossed,
+  Clapperboard: Clapperboard,
+  Landmark: Landmark,
 }
 
 const CategoryIcon = computed(() => iconMap[props.category.icon] || HelpCircle)
@@ -126,7 +128,7 @@ const themeStyles = computed(() => {
 
     <!-- Subtitle / Meta -->
     <p class="text-xs text-slate-400 mb-4 flex items-center gap-1.5">
-      <span>⏱ Soru başına 5 saniye</span>
+      <span>⏱ Soru başına 10 saniye</span>
       <span>•</span>
       <span>⚡ Refleks Testi</span>
     </p>

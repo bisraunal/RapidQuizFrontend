@@ -8,7 +8,7 @@
 ![Pinia](https://img.shields.io/badge/Pinia-State_Management-FFE56A?style=for-the-badge&logo=vue.js&logoColor=black)
 ![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-**Her soru 5 saniye! Hızlı düşünme, anlık refleks ve canlı lider tablosu ile modern quiz web uygulaması.**
+**Her soru 10 saniye! Hızlı düşünme, anlık refleks ve canlı lider tablosu ile modern quiz web uygulaması.**
 
 [Canlı Demo](https://rapid-quiz-frontend-black.vercel.app/) • [Backend Reposu](https://github.com/bisraunal/RapidQuizBackend)
 
@@ -18,7 +18,7 @@
 
 ## Oyun Deneyimi ve Özellikler
 
-* **5 Saniyelik Dinamik Geri Sayım Barı:** Yeşil, Sarı ve Kırmızı renk geçişli sayaç.
+* **10 Saniyelik Dinamik Geri Sayım Barı:** Yeşil, Sarı ve Kırmızı renk geçişli sayaç.
 * **Dahili Web Audio Ses Efektleri:** Sıfır dış dosya bağımlılığıyla tık sesleri, geri sayım uyarıları, süre bitimi ve kutlama fanfarı.
 * **Klavye Kısayol Desteği:** Masaüstü kullanıcıları için `A, B, C, D` veya `1, 2, 3, 4` tuşlarıyla anlık cevaplama.
 * **Detaylı Cevap İnceleme ve Öğrenme Modu:** Quiz bitiminde doğru, yanlış ve boş bırakılan soruları doğru şıklarla karşılaştırmalı inceleme.
@@ -39,7 +39,7 @@ src/
 │   ├── LeaderboardTable.vue   # Top 10 sıralama tablosu
 │   ├── Navbar.vue             # Logo, navigasyon ve ses kontrolü
 │   ├── QuestionCard.vue       # Soru ve şık kartı
-│   └── TimerBar.vue           # 5s renk değiştiren sayaç
+│   └── TimerBar.vue           # 10s renk değiştiren sayaç
 ├── router/          # Vue Router rotaları
 ├── services/        # Axios API ve Web Audio Sound yöneticisi
 ├── stores/          # Pinia Quiz state yönetimi

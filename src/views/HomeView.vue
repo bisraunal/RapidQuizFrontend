@@ -28,21 +28,21 @@ const handleCategorySelect = (slug) => {
       </div>
 
       <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4">
-        5 Saniyede Bil,<br />
+        10 Saniyede Bil,<br />
         <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
           Zirveye Yerleş!
         </span>
       </h1>
 
       <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-        Her soru için tam 5 saniye süren var. Doğru cevabı ne kadar hızlı verirsen o kadar yüksek bonus puan kazanırsın!
+        Her soru için tam 10 saniye süren var. Doğru cevabı ne kadar hızlı verirsen o kadar yüksek bonus puan kazanırsın!
       </p>
 
       <!-- Feature pills -->
       <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-300">
         <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800">
           <Clock class="w-4 h-4 text-cyan-400" />
-          <span>Soru Başına 5s Kısıtı</span>
+          <span>Soru Başına 10s Kısıtı</span>
         </div>
         <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800">
           <Zap class="w-4 h-4 text-amber-400" />

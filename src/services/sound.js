@@ -75,10 +75,13 @@ class SoundManager {
       case 'ascilik': return 480      // Smooth Bossa Lounge tempo
       case 'yazilim': return 220      // Fast Synthwave tempo
       case 'yapay-zeka': return 400   // Futuristic ambient pulse
+      case 'teknoloji':
       case 'bilgisayar-muhendisligi': return 200 // Retro 8-bit arcade
       case 'fizik': return 650        // Deep space cosmic drift
       case 'futbol': return 260       // Stadium action beat
       case 'ulkeler': return 320      // World acoustic adventure
+      case 'sinema': return 450       // Cinematic suspense tempo
+      case 'tarih': return 360        // Ancient historical epic tempo
       default: return 350
     }
   }
@@ -97,6 +100,7 @@ class SoundManager {
       case 'yapay-zeka': // Neural Ambient Tech
         this.playNeuralNote(this.stepIndex, now)
         break
+      case 'teknoloji':
       case 'bilgisayar-muhendisligi': // Retro 8-bit Arcade
         this.playArcadeNote(this.stepIndex, now)
         break
@@ -105,6 +109,12 @@ class SoundManager {
         break
       case 'futbol': // Stadium Champions Rock Beat
         this.playStadiumNote(this.stepIndex, now)
+        break
+      case 'sinema': // Cinematic Mystery Suspense
+        this.playCinemaNote(this.stepIndex, now)
+        break
+      case 'tarih': // Ancient Empires Historical Pulse
+        this.playHistoryNote(this.stepIndex, now)
         break
       case 'ulkeler': // World Acoustic Journey
       default:
@@ -223,6 +233,26 @@ class SoundManager {
     this.synthTone(note, 'triangle', 0.28, 0.08, now)
     if (step % 4 === 0) {
       this.synthTone(98.00, 'sine', 0.35, 0.15, now)
+    }
+  }
+
+  // --- 8. Sinema (Cinematic Mystery Suspense) ---
+  playCinemaNote(step, now) {
+    const cinemaChords = [146.83, 174.61, 220.00, 196.00, 164.81, 146.83]
+    const chord = cinemaChords[step % cinemaChords.length]
+    this.synthTone(chord, 'sine', 0.65, 0.07, now)
+    if (step % 4 === 0) {
+      this.synthTone(73.42, 'triangle', 0.8, 0.16, now) // Deep cinematic brass/sub
+    }
+  }
+
+  // --- 9. Tarih (Ancient Empires Historical Epic) ---
+  playHistoryNote(step, now) {
+    const phrygianScale = [164.81, 174.61, 196.00, 220.00, 246.94, 261.63]
+    const note = phrygianScale[step % phrygianScale.length]
+    this.synthTone(note, 'sawtooth', 0.24, 0.06, now)
+    if (step % 4 === 0) {
+      this.synthTone(82.41, 'sine', 0.45, 0.18, now) // War drum pulse
     }
   }
 
