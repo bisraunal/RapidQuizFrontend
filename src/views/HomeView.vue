@@ -88,15 +88,15 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
       <div class="relative glass-card p-6 sm:p-8 rounded-3xl border border-purple-500/30 bg-slate-900/90 shadow-2xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-xl">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-700/50 text-purple-300 text-xs font-bold mb-3">
-              <Sparkles class="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-              <span>YENİ • GEMINI AI DESTEKLİ</span>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/80 border border-purple-700/50 text-purple-300 text-xs font-bold mb-2.5">
+              <Sparkles class="w-3.5 h-3.5 text-purple-400" />
+              <span>GEMINI AI QUIZ</span>
             </div>
-            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
-              Kendi Konunu Yaz, AI 10 Saniyede Özel Quizini Üretsin!
+            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-1.5">
+              İstediğin Konuda Quiz Başlat
             </h3>
             <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              İster sevdiğin bir dizi, ister kuantum fiziği, ister mitoloji... İstediğin başlığı gir; yapay zeka sana özel 5 soruluk 10 saniye refleks testini saniyeler içinde hazırlasın!
+              Konunu yaz; yapay zeka 5 soruluk 10s refleks testini anında hazırlasın.
             </p>
           </div>
 
