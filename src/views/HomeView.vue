@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useQuizStore } from '@/stores/quiz'
 import CategoryCard from '@/components/CategoryCard.vue'
-import { Zap, Clock, Trophy, Sparkles, AlertCircle, Wand2, Loader2 } from 'lucide-vue-next'
+import { Sparkles, AlertCircle, Wand2, Loader2 } from 'lucide-vue-next'
 
 const quizStore = useQuizStore()
 const aiTopic = ref('')
@@ -46,41 +46,15 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
 <template>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
     <!-- Hero Banner -->
-    <div class="relative text-center mb-12 sm:mb-16">
+    <div class="relative text-center mb-10 sm:mb-12">
       <!-- Glow background -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-96 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card border-cyan-500/30 text-cyan-300 text-xs sm:text-sm font-semibold mb-6 animate-pulse">
-        <Sparkles class="w-4 h-4 text-cyan-400" />
-        <span>Hızlı Düşün, Anlık Cevapla!</span>
-      </div>
-
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-4">
-        10 Saniyede Bil,<br />
+      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-white">
         <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
-          Zirveye Yerleş!
+          10 Saniye
         </span>
       </h1>
-
-      <p class="text-slate-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
-        Her soru için tam 10 saniye süren var. Doğru cevabı ne kadar hızlı verirsen o kadar yüksek bonus puan kazanırsın!
-      </p>
-
-      <!-- Feature pills -->
-      <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-300">
-        <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800">
-          <Clock class="w-4 h-4 text-cyan-400" />
-          <span>Soru Başına 10s Kısıtı</span>
-        </div>
-        <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800">
-          <Zap class="w-4 h-4 text-amber-400" />
-          <span>Hız Bonusu Puanı</span>
-        </div>
-        <div class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800">
-          <Trophy class="w-4 h-4 text-purple-400" />
-          <span>Canlı Top 10 Skorbord</span>
-        </div>
-      </div>
     </div>
 
     <!-- AI Custom Quiz Generator Card -->
@@ -97,7 +71,7 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
               İstediğin Konuda Quiz Başlat
             </h3>
             <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Konunu yaz; yapay zeka 5 soruluk 10s refleks testini anında hazırlasın.
+              Konunu yaz; yapay zeka 5 soruluk testini anında hazırlasın.
             </p>
           </div>
 

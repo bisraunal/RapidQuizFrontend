@@ -29,9 +29,6 @@ const toggleSound = () => {
           <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
             RAPID QUIZ
           </span>
-          <span class="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-400 border border-cyan-800/50">
-            10s Refleks
-          </span>
         </div>
       </router-link>
 

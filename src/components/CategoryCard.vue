@@ -123,16 +123,9 @@ const themeStyles = computed(() => {
     </div>
 
     <!-- Category Title -->
-    <h3 class="text-xl font-bold text-slate-100 group-hover:text-white mb-2 transition-colors">
+    <h3 class="text-xl font-bold text-slate-100 group-hover:text-white mb-4 transition-colors">
       {{ category.name }}
     </h3>
-
-    <!-- Subtitle / Meta -->
-    <p class="text-xs text-slate-400 mb-4 flex items-center gap-1.5">
-      <span>⏱ Soru başına 10 saniye</span>
-      <span>•</span>
-      <span>⚡ Refleks Testi</span>
-    </p>
 
     <!-- Music Info Tag -->
     <div v-if="category.music_title" class="mb-4 flex items-center gap-1.5 text-[11px] text-slate-400/90 bg-slate-900/60 py-1 px-2.5 rounded-lg border border-slate-800/70">
