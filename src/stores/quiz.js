@@ -94,6 +94,42 @@ export const useQuizStore = defineStore('quiz', {
       }
     },
 
+    async startAiQuiz(topic) {
+      this.resetQuiz()
+      this.isLoading = true
+      this.error = null
+      sound.playClick()
+
+      try {
+        const response = await api.generateAiQuiz(topic)
+        const data = response.data
+        this.currentCategory = {
+          name: data.category,
+          slug: data.category_slug,
+          icon: data.icon,
+          colorTheme: data.color_theme,
+          musicUrl: data.music_url,
+          musicTitle: data.music_title,
+        }
+        this.questions = data.questions || []
+        this.currentQuestionIndex = 0
+
+        sound.playCategoryBgm(data.category_slug)
+
+        if (this.questions.length > 0) {
+          router.push(`/quiz/${data.category_slug}`)
+        } else {
+          this.error = 'Yapay zeka soru üretemedi, lütfen tekrar deneyin.'
+        }
+      } catch (err) {
+        console.error('Failed to start AI quiz:', err)
+        this.error = 'AI Quiz oluşturulurken hata oluştu. Backend bağlantısını kontrol edin.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
     startQuestionTimer() {
       this.stopQuestionTimer()
       this.timeRemaining = 10.0

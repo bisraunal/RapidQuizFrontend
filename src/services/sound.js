@@ -71,6 +71,7 @@ class SoundManager {
   }
 
   getThemeInterval(slug) {
+    if (slug && slug.startsWith('ai-')) return 400
     switch (slug) {
       case 'ascilik': return 480      // Smooth Bossa Lounge tempo
       case 'yazilim': return 220      // Fast Synthwave tempo
@@ -89,6 +90,12 @@ class SoundManager {
   tickBgm(slug) {
     if (this.isMuted || !this.ctx || !this.bgmGain) return
     const now = this.ctx.currentTime
+
+    if (slug && slug.startsWith('ai-')) {
+      this.playNeuralNote(this.stepIndex, now)
+      this.stepIndex = (this.stepIndex + 1) % 32
+      return
+    }
 
     switch (slug) {
       case 'ascilik': // Bistro Gourmet / Cozy Bossa Jazz

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { Code2, Bot, Cpu, Globe, Atom, Trophy, ChefHat, UtensilsCrossed, Clapperboard, Landmark, HelpCircle, ArrowRight, Music } from 'lucide-vue-next'
+import { Code2, Bot, Cpu, Globe, Atom, Trophy, ChefHat, UtensilsCrossed, Clapperboard, Landmark, Sparkles, HelpCircle, ArrowRight, Music } from 'lucide-vue-next'
 
 const props = defineProps({
   category: {
@@ -22,6 +22,7 @@ const iconMap = {
   UtensilsCrossed: UtensilsCrossed,
   Clapperboard: Clapperboard,
   Landmark: Landmark,
+  Sparkles: Sparkles,
 }
 
 const CategoryIcon = computed(() => iconMap[props.category.icon] || HelpCircle)

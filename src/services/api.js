@@ -26,6 +26,11 @@ export default {
     return apiClient.post('/quiz/submit/', payload)
   },
 
+  // AI Dynamic Quiz Generation
+  generateAiQuiz(topic) {
+    return apiClient.post('/quiz/generate-ai/', { topic })
+  },
+
   // Leaderboard
   getLeaderboard(category = null) {
     const params = {}
