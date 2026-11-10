@@ -44,19 +44,7 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-    <!-- Hero Banner -->
-    <div class="relative text-center mb-10 sm:mb-12">
-      <!-- Glow background -->
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-96 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-      <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight text-white">
-        <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
-          10 Saniye
-        </span>
-      </h1>
-    </div>
-
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
     <!-- AI Custom Quiz Generator Card -->
     <div class="mb-14 relative group">
       <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 rounded-3xl blur opacity-35 group-hover:opacity-70 transition duration-500"></div>
