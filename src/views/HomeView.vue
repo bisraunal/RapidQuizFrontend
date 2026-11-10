@@ -10,12 +10,13 @@ const isGeneratingAi = ref(false)
 const aiError = ref(null)
 
 const quickTopics = [
+  'Coğrafya',
   'Kuantum Fiziği',
   'Yüzüklerin Efendisi',
   'Cyberpunk 2077',
   'Yunan Mitolojisi',
   'Formula 1',
-  'Antik Roma',
+  'Edebiyat',
 ]
 
 onMounted(() => {
@@ -35,7 +36,7 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
   try {
     await quizStore.startAiQuiz(topicToUse)
   } catch (err) {
-    aiError.value = 'Quiz üretilirken bir sorun oluştu. Lütfen tekrar deneyin.'
+    aiError.value = err.message || quizStore.error || 'Quiz üretilirken bir sorun oluştu.'
   } finally {
     isGeneratingAi.value = false
   }

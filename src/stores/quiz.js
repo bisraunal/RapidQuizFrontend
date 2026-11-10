@@ -123,8 +123,9 @@ export const useQuizStore = defineStore('quiz', {
         }
       } catch (err) {
         console.error('Failed to start AI quiz:', err)
-        this.error = 'AI Quiz oluşturulurken hata oluştu. Backend bağlantısını kontrol edin.'
-        throw err
+        const msg = err.response?.data?.error || 'AI Quiz oluşturulurken hata oluştu. Lütfen tekrar deneyin.'
+        this.error = msg
+        throw new Error(msg)
       } finally {
         this.isLoading = false
       }
