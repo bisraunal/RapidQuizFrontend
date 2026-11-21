@@ -106,13 +106,37 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
       </div>
     </div>
 
+    <!-- Server Wakeup Banner -->
+    <div
+      v-if="quizStore.isWakingUp"
+      class="mb-6 p-4 rounded-2xl bg-amber-950/40 border border-amber-600/50 text-amber-300 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-lg backdrop-blur-sm animate-pulse"
+    >
+      <div class="flex items-center gap-3">
+        <Loader2 class="w-5 h-5 shrink-0 animate-spin text-amber-400" />
+        <div>
+          <p class="font-bold">Sunucu uyku modundan uyanıyor...</p>
+          <p class="text-[11px] text-amber-400/80">Render ücretsiz sunucusu ilk açılışta 20-30 saniye sürebilir, kategorileriniz hazır.</p>
+        </div>
+      </div>
+      <span class="hidden sm:inline-block text-xs px-2.5 py-1 rounded-full bg-amber-900/60 border border-amber-500/40 font-mono">Uyanıyor</span>
+    </div>
+
     <!-- Error Alert -->
     <div
       v-if="quizStore.error"
-      class="mb-8 p-4 rounded-2xl bg-rose-950/50 border border-rose-800/80 text-rose-300 text-sm flex items-center gap-3"
+      class="mb-8 p-4 rounded-2xl bg-rose-950/50 border border-rose-800/80 text-rose-300 text-sm flex items-center justify-between gap-3"
     >
-      <AlertCircle class="w-5 h-5 shrink-0 text-rose-400" />
-      <span>{{ quizStore.error }}</span>
+      <div class="flex items-center gap-3">
+        <AlertCircle class="w-5 h-5 shrink-0 text-rose-400" />
+        <span>{{ quizStore.error }}</span>
+      </div>
+      <button
+        @click="quizStore.fetchCategories()"
+        type="button"
+        class="px-3 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 border border-rose-700 text-xs font-semibold text-rose-200 transition-colors cursor-pointer shrink-0"
+      >
+        Tekrar Dene
+      </button>
     </div>
 
     <!-- Category Section Header -->
@@ -123,8 +147,8 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
       </div>
     </div>
 
-    <!-- Loading Skeleton -->
-    <div v-if="quizStore.isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Loading Skeleton (only if no categories loaded yet) -->
+    <div v-if="quizStore.isLoading && (!quizStore.categories || quizStore.categories.length === 0)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <div
         v-for="i in 5"
         :key="i"
@@ -143,7 +167,7 @@ const handleGenerateAiQuiz = async (customTopic = null) => {
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       <CategoryCard
         v-for="category in quizStore.categories"
-        :key="category.id"
+        :key="category.id || category.slug"
         :category="category"
         @select="handleCategorySelect"
       />

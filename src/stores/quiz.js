@@ -3,9 +3,115 @@ import api from '@/services/api'
 import sound from '@/services/sound'
 import router from '@/router'
 
+export const DEFAULT_CATEGORIES = [
+  {
+    id: 'cat-yazilim',
+    name: 'Yazılım',
+    slug: 'yazilim',
+    icon: 'Code2',
+    color_theme: 'cyan',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-cyber-city-110.mp3',
+    music_title: 'Cyber City - Synthwave Code Beat',
+    question_count: 20,
+  },
+  {
+    id: 'cat-yapay-zeka',
+    name: 'Yapay Zeka',
+    slug: 'yapay-zeka',
+    icon: 'Bot',
+    color_theme: 'purple',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
+    music_title: 'Neural Network - Futuristic Tech Beats',
+    question_count: 20,
+  },
+  {
+    id: 'cat-teknoloji',
+    name: 'Teknoloji',
+    slug: 'teknoloji',
+    icon: 'Cpu',
+    color_theme: 'cyan',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-electronic-technology-gaming-beat-296.mp3',
+    music_title: 'Silicon Pulse - Retro Tech Arp',
+    question_count: 20,
+  },
+  {
+    id: 'cat-ulkeler',
+    name: 'Ülkeler',
+    slug: 'ulkeler',
+    icon: 'Globe',
+    color_theme: 'amber',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-world-odyssey-120.mp3',
+    music_title: 'World Odyssey - Global Acoustic Journey',
+    question_count: 20,
+  },
+  {
+    id: 'cat-fizik',
+    name: 'Fizik',
+    slug: 'fizik',
+    icon: 'Atom',
+    color_theme: 'blue',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-cosmic-horizon-95.mp3',
+    music_title: 'Cosmic Horizon - Deep Space Ambient',
+    question_count: 20,
+  },
+  {
+    id: 'cat-futbol',
+    name: 'Futbol',
+    slug: 'futbol',
+    icon: 'Trophy',
+    color_theme: 'emerald',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-stadium-champions-140.mp3',
+    music_title: 'Stadium Champions - Energetic Rock Beat',
+    question_count: 20,
+  },
+  {
+    id: 'cat-ascilik',
+    name: 'Aşçılık',
+    slug: 'ascilik',
+    icon: 'ChefHat',
+    color_theme: 'orange',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-bistro-gourmet-105.mp3',
+    music_title: 'Bistro Gourmet - Cozy Kitchen Bossa Nova',
+    question_count: 20,
+  },
+  {
+    id: 'cat-sinema',
+    name: 'Sinema',
+    slug: 'sinema',
+    icon: 'Clapperboard',
+    color_theme: 'purple',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-hum-2852.mp3',
+    music_title: 'Cinematic Drama - Film Score',
+    question_count: 20,
+  },
+  {
+    id: 'cat-tarih',
+    name: 'Tarih',
+    slug: 'tarih',
+    icon: 'Landmark',
+    color_theme: 'amber',
+    music_url: 'https://assets.mixkit.co/music/preview/mixkit-ancient-whispers-432.mp3',
+    music_title: 'Ancient Empires - Historic Battle',
+    question_count: 20,
+  },
+]
+
+function getInitialCategories() {
+  try {
+    const cached = localStorage.getItem('rapidquiz_categories')
+    if (cached) {
+      const parsed = JSON.parse(cached)
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    }
+  } catch (e) {
+    // ignore json error
+  }
+  return DEFAULT_CATEGORIES
+}
+
 export const useQuizStore = defineStore('quiz', {
   state: () => ({
-    categories: [],
+    categories: getInitialCategories(),
     currentCategory: null,
     questions: [],
     currentQuestionIndex: 0,
@@ -28,6 +134,7 @@ export const useQuizStore = defineStore('quiz', {
     quizResult: null,
     isSubmitting: false,
     isLoading: false,
+    isWakingUp: false,
     error: null,
   }),
 
@@ -45,15 +152,34 @@ export const useQuizStore = defineStore('quiz', {
 
   actions: {
     async fetchCategories() {
-      this.isLoading = true
+      if (!this.categories || this.categories.length === 0) {
+        this.isLoading = true
+      }
       this.error = null
+
+      const wakeUpTimer = setTimeout(() => {
+        this.isWakingUp = true
+      }, 2500)
+
       try {
         const response = await api.getCategories()
-        this.categories = response.data
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          this.categories = response.data
+          try {
+            localStorage.setItem('rapidquiz_categories', JSON.stringify(response.data))
+          } catch (e) {
+            // ignore localStorage quota
+          }
+        }
       } catch (err) {
-        console.error('Failed to fetch categories:', err)
-        this.error = 'Kategoriler yüklenirken bir hata oluştu.'
+        console.warn('API Kategorileri getirirken uyarı:', err)
+        if (!this.categories || this.categories.length === 0) {
+          this.categories = DEFAULT_CATEGORIES
+          this.error = 'Sunucuya bağlanılamadı, varsayılan kategoriler yüklendi.'
+        }
       } finally {
+        clearTimeout(wakeUpTimer)
+        this.isWakingUp = false
         this.isLoading = false
       }
     },

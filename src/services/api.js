@@ -7,8 +7,33 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 45000,
 })
+
+// Otomatik yeniden deneme: Render uyku modundan (cold-start) uyanırken veya ağ kopmalarında
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config
+    if (!config) return Promise.reject(error)
+
+    config.__retryCount = config.__retryCount || 0
+    const maxRetries = 2
+
+    const isNetworkOrTimeout = error.code === 'ECONNABORTED' || !error.response
+    const isServerError = error.response && [502, 503, 504].includes(error.response.status)
+
+    if ((isNetworkOrTimeout || isServerError) && config.__retryCount < maxRetries) {
+      config.__retryCount += 1
+      const delay = config.__retryCount * 2500
+      console.warn(`[API] Bağlantı yeniden deneniyor (${config.__retryCount}/${maxRetries}) - ${config.url}`)
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      return apiClient(config)
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 export default {
   // Categories
