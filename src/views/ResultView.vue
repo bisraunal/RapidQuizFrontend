@@ -18,17 +18,21 @@ import {
   ArrowRight,
   ListOrdered,
   BookOpen,
+  Loader2,
+  AlertCircle,
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const quizStore = useQuizStore()
 
 const playerName = ref(quizStore.savedPlayerName || '')
-const isSubmitted = ref(false)
+const isSaved = ref(false)
+const isSubmittingName = ref(false)
 const inputError = ref('')
+const submitError = ref('')
 const activeTab = ref('leaderboard') // 'leaderboard' or 'review'
 
-onMounted(() => {
+onMounted(async () => {
   // If no answers exist, redirect to home
   if (quizStore.answers.length === 0) {
     router.push('/')
@@ -38,6 +42,22 @@ onMounted(() => {
   // Trigger celebration confetti & chime
   sound.playCelebration()
   triggerConfetti()
+
+  // Auto-calculate & save score immediately so user ALWAYS sees their score!
+  if (!quizStore.quizResult) {
+    const initialName = playerName.value.trim() || 'Oyuncu'
+    try {
+      await quizStore.submitScore(initialName)
+      if (playerName.value.trim() && playerName.value.trim() !== 'Oyuncu') {
+        isSaved.value = true
+      }
+    } catch (err) {
+      console.warn('Auto score calculation error:', err)
+      submitError.value = err.response?.data?.error || quizStore.error || 'Skor hesaplanırken bir sorun oluştu.'
+    }
+  } else {
+    isSaved.value = true
+  }
 })
 
 const triggerConfetti = () => {
@@ -68,22 +88,28 @@ const triggerConfetti = () => {
 }
 
 const handleSaveScore = async () => {
-  if (!playerName.value.trim()) {
+  const cleanName = playerName.value.trim()
+  if (!cleanName) {
     inputError.value = 'Lütfen skorborda yazılacak bir takma ad girin.'
     return
   }
-  if (playerName.value.trim().length < 2) {
+  if (cleanName.length < 2) {
     inputError.value = 'Takma ad en az 2 karakter olmalıdır.'
     return
   }
 
   inputError.value = ''
+  submitError.value = ''
+  isSubmittingName.value = true
+
   try {
-    await quizStore.submitScore(playerName.value.trim())
-    isSubmitted.value = true
+    await quizStore.submitScore(cleanName)
+    isSaved.value = true
     triggerConfetti()
   } catch (err) {
-    // handled in store
+    submitError.value = err.response?.data?.error || quizStore.error || 'Skor kaydedilirken bir hata oluştu.'
+  } finally {
+    isSubmittingName.value = false
   }
 }
 
@@ -115,7 +141,7 @@ const handleChooseCategory = () => {
         Tebrikler! Quiz Tamamlandı
       </h1>
       <p class="text-slate-400 text-sm sm:text-base mt-2">
-        <span class="font-bold text-cyan-400">{{ quizStore.currentCategory?.name }}</span> kategorisinde 20 soruyu tamamladın.
+        <span class="font-bold text-cyan-400">{{ quizStore.currentCategory?.name || 'Quiz' }}</span> kategorisindeki soruları tamamladın.
       </p>
     </div>
 
@@ -166,76 +192,93 @@ const handleChooseCategory = () => {
       </div>
     </div>
 
-    <!-- 1. State: Name Input Form (Before Submit) -->
+    <!-- Error Alert if any -->
     <div
-      v-if="!isSubmitted"
-      class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden mb-8"
+      v-if="submitError"
+      class="mb-6 p-4 rounded-2xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-lg"
     >
-      <div class="max-w-md mx-auto text-center">
-        <h3 class="text-xl font-bold text-slate-100 mb-1">
-          Skorunu Kaydet & Lider Tablosuna Gir!
-        </h3>
-        <p class="text-xs text-slate-400 mb-6">
-          Adını veya takma adını girerek puanını skorborda yazdır ve doğru/yanlış cevaplarını incele.
-        </p>
-
-        <form @submit.prevent="handleSaveScore" class="space-y-4">
-          <div>
-            <input
-              v-model="playerName"
-              type="text"
-              maxlength="20"
-              placeholder="Örn: EfsaneYazilimci"
-              class="w-full px-5 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 text-white placeholder-slate-500 text-center text-lg font-bold focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition-all"
-              :disabled="quizStore.isSubmitting"
-            />
-            <p v-if="inputError" class="text-xs text-rose-400 font-semibold mt-2">
-              {{ inputError }}
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            :disabled="quizStore.isSubmitting"
-            class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-base shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span v-if="quizStore.isSubmitting">Hesaplanıyor & Kaydediliyor...</span>
-            <span v-else class="flex items-center gap-2">
-              Skorunu Gönder & Sonuçları Gör
-              <ArrowRight class="w-5 h-5" />
-            </span>
-          </button>
-        </form>
+      <div class="flex items-center gap-2">
+        <AlertCircle class="w-5 h-5 shrink-0 text-rose-400" />
+        <span>{{ submitError }}</span>
       </div>
+      <button
+        @click="handleSaveScore"
+        class="px-3 py-1.5 rounded-lg bg-rose-800 hover:bg-rose-700 text-white font-bold text-xs transition-colors shrink-0"
+      >
+        Tekrar Dene
+      </button>
     </div>
 
-    <!-- 2. State: Results, Leaderboard & Answer Review (After Submit) -->
-    <div v-else class="space-y-8 mb-8">
+    <!-- Loading State: Calculating Score -->
+    <div
+      v-if="!quizStore.quizResult && quizStore.isSubmitting"
+      class="glass-card p-10 rounded-3xl border border-slate-800 shadow-2xl text-center max-w-md mx-auto mb-8 animate-pulse"
+    >
+      <Loader2 class="w-10 h-10 animate-spin text-cyan-400 mx-auto mb-3" />
+      <h3 class="text-lg font-bold text-white mb-1">Skorun Hesaplanıyor...</h3>
+      <p class="text-xs text-slate-400">Doğrular analiz ediliyor ve liderlik sıralaman belirleniyor.</p>
+    </div>
+
+    <!-- Results Section (Visible as soon as score is ready) -->
+    <div v-else-if="quizStore.quizResult" class="space-y-8 mb-8">
       <!-- Player Result Highlight Banner -->
       <div class="glass-card p-6 sm:p-8 rounded-3xl border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 shadow-2xl text-center relative overflow-hidden">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-300 text-xs font-bold mb-3 border border-cyan-400/30">
-          <span>🏆 Derecen: {{ quizStore.quizResult?.rank }}. Sıra</span>
+          <span>🏆 Derecen: {{ quizStore.quizResult.rank }}. Sıra</span>
         </div>
 
         <div class="text-4xl sm:text-6xl font-black bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent mb-2">
-          {{ quizStore.quizResult?.total_score }} PUAN
+          {{ quizStore.quizResult.total_score }} PUAN
         </div>
 
         <div class="flex items-center justify-center gap-4 text-xs sm:text-sm font-semibold text-slate-300">
           <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
             <CheckCircle2 class="w-4 h-4" />
-            {{ quizStore.quizResult?.correct_count }} Doğru
+            {{ quizStore.quizResult.correct_count }} Doğru
           </span>
           <span>•</span>
           <span class="flex items-center gap-1.5 text-rose-400 font-bold">
             <XCircle class="w-4 h-4" />
-            {{ quizStore.quizResult?.wrong_count }} Yanlış
+            {{ quizStore.quizResult.wrong_count }} Yanlış
           </span>
           <span>•</span>
           <span class="flex items-center gap-1.5 text-sky-400 font-bold">
             <Clock class="w-4 h-4" />
-            {{ quizStore.quizResult?.total_time_taken }}s
+            {{ quizStore.quizResult.total_time_taken }}s
           </span>
+        </div>
+      </div>
+
+      <!-- Player Name Registration / Update Card -->
+      <div class="glass-card p-5 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/60 max-w-md mx-auto text-center shadow-lg">
+        <div v-if="isSaved" class="flex items-center justify-center gap-2 text-emerald-400 text-xs sm:text-sm font-bold py-1">
+          <CheckCircle2 class="w-4 h-4 shrink-0" />
+          <span>Skorun liderlik tablosuna <strong class="text-white">{{ quizStore.quizResult.player_name }}</strong> adıyla kaydedildi!</span>
+        </div>
+
+        <div v-else class="space-y-3">
+          <p class="text-xs text-slate-300 font-medium">
+            Skorunu skorborda kaydetmek için takma adını gir:
+          </p>
+          <form @submit.prevent="handleSaveScore" class="flex flex-col sm:flex-row gap-2">
+            <input
+              v-model="playerName"
+              type="text"
+              maxlength="20"
+              placeholder="Örn: EfsaneOyuncu"
+              class="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm font-bold focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-center sm:text-left"
+              :disabled="isSubmittingName"
+            />
+            <button
+              type="submit"
+              :disabled="isSubmittingName || !playerName.trim()"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs sm:text-sm shadow-md hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <Loader2 v-if="isSubmittingName" class="w-4 h-4 animate-spin" />
+              <span>{{ isSubmittingName ? 'Kaydediliyor...' : 'Skorborda Kaydet' }}</span>
+            </button>
+          </form>
+          <p v-if="inputError" class="text-xs text-rose-400 font-semibold text-center">{{ inputError }}</p>
         </div>
       </div>
 
@@ -243,7 +286,7 @@ const handleChooseCategory = () => {
       <div class="flex items-center justify-center gap-3 border-b border-slate-800 pb-4">
         <button
           @click="activeTab = 'leaderboard'"
-          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border"
+          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border cursor-pointer"
           :class="[
             activeTab === 'leaderboard'
               ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-lg shadow-amber-400/20'
@@ -256,7 +299,7 @@ const handleChooseCategory = () => {
 
         <button
           @click="activeTab = 'review'"
-          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border"
+          class="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 border cursor-pointer"
           :class="[
             activeTab === 'review'
               ? 'bg-cyan-400 text-slate-950 border-cyan-400 shadow-lg shadow-cyan-400/20'
@@ -274,23 +317,47 @@ const handleChooseCategory = () => {
           <div class="flex items-center gap-2">
             <ListOrdered class="w-5 h-5 text-cyan-400" />
             <h3 class="text-xl font-bold text-white">
-              {{ quizStore.currentCategory?.name }} — Top 10 Lider Tablosu
+              {{ quizStore.currentCategory?.name || 'Kategori' }} — Top 10 Lider Tablosu
             </h3>
           </div>
         </div>
 
         <LeaderboardTable
-          :scores="quizStore.quizResult?.top_10 || []"
-          :highlight-player-name="quizStore.quizResult?.player_name"
+          :scores="quizStore.quizResult.top_10 || []"
+          :highlight-player-name="quizStore.quizResult.player_name"
         />
       </div>
 
       <!-- Tab 2: Educational Answer Review -->
       <div v-if="activeTab === 'review'">
         <AnswerReview
-          :breakdown="quizStore.quizResult?.results_breakdown || []"
+          :breakdown="quizStore.quizResult.results_breakdown || []"
         />
       </div>
+    </div>
+
+    <!-- Fallback if not submitted and not calculating yet -->
+    <div
+      v-else
+      class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl text-center max-w-md mx-auto mb-8"
+    >
+      <h3 class="text-xl font-bold text-slate-100 mb-1">Skorunu Görmek İçin Gönder</h3>
+      <p class="text-xs text-slate-400 mb-6">Bir takma ad yazarak skorunu hesaplat.</p>
+      <form @submit.prevent="handleSaveScore" class="space-y-4">
+        <input
+          v-model="playerName"
+          type="text"
+          placeholder="Örn: EfsaneYazilimci"
+          class="w-full px-5 py-3.5 rounded-2xl bg-slate-900 border border-slate-700 text-white text-center text-lg font-bold"
+        />
+        <button
+          type="submit"
+          :disabled="isSubmittingName"
+          class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-base shadow-lg cursor-pointer"
+        >
+          Skorunu Hesapla & Göster
+        </button>
+      </form>
     </div>
 
     <!-- Action Buttons Footer -->
